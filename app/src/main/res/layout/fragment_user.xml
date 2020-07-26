@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragment.UserFragment">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/mcvHead"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="48dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/transparent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/ivHead"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@mipmap/ic_launcher" />
+    </com.google.android.material.card.MaterialCardView>
+
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:textSize="@dimen/text_size_title"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintTop_toBottomOf="@id/mcvHead" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/llSignIn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvName">
+
+        <EditText
+            android:id="@+id/etUsername"
+            android:layout_width="match_parent"
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="32dp"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingStart="48dp"
+            android:paddingEnd="16dp"
+            android:text="hins"
+            android:background="@drawable/shape_chapter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="33dp"
+            android:layout_height="32dp"
+            android:src="@mipmap/icon_user"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="@id/etUsername"
+            app:layout_constraintTop_toTopOf="@id/etUsername"
+            app:layout_constraintBottom_toBottomOf="@id/etUsername" />
+
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
+            android:layout_marginTop="32dp"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:paddingStart="48dp"
+            android:paddingEnd="16dp"
+            android:text="zhou0828oh"
+            android:background="@drawable/shape_chapter"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etUsername" />
+
+
+        <ImageView
+            android:layout_width="33dp"
+            android:layout_height="32dp"
+            android:src="@mipmap/icon_pass"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="@id/etPassword"
+            app:layout_constraintTop_toTopOf="@id/etPassword"
+            app:layout_constraintBottom_toBottomOf="@id/etPassword" />
+
+        <EditText
+            android:id="@+id/etVerify"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="32dp"
+            android:inputType="number"
+            android:maxLines="1"
+            android:paddingStart="48dp"
+            android:paddingEnd="16dp"
+            android:background="@drawable/shape_chapter"
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/etPassword" />
+
+
+        <ImageView
+            android:layout_width="33dp"
+            android:layout_height="32dp"
+            android:src="@mipmap/icon_verify"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="@id/etVerify"
+            app:layout_constraintTop_toTopOf="@id/etVerify"
+            app:layout_constraintBottom_toBottomOf="@id/etVerify" />
+
+        <ImageView
+            android:id="@+id/ivVerify"
+            android:layout_width="96dp"
+            android:layout_height="0dp"
+            android:layout_margin="4dp"
+            android:clickable="true"
+            app:layout_constraintEnd_toEndOf="@id/etVerify"
+            app:layout_constraintTop_toTopOf="@id/etVerify"
+            app:layout_constraintBottom_toBottomOf="@id/etVerify" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:src="@mipmap/icon_enter"
+        app:layout_constraintTop_toBottomOf="@id/llSignIn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:backgroundTint="@color/colorAccent"
+        app:tint="@color/white" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="text_size_sub">12sp</dimen>
+    <dimen name="text_size_title">16sp</dimen>
+
+    <dimen name="cover_width_small">100dp</dimen>
+    <dimen name="cover_height_small">150dp</dimen>
+
+    <dimen name="cover_width">120dp</dimen>
+    <dimen name="cover_height">180dp</dimen>
+
+    <integer name="column_like">3</integer>
+
+</resources>
