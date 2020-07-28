@@ -48,18 +48,20 @@ class LikeFragment : BaseFragment() {
 
     private var user = User()
     private fun initData() {
-        val url = "https://www.ohmanhua.com/dynamic/user/subscription?t=" + System.currentTimeMillis()
+        user = OhDatabase.db.getLogin()
 
+        val url = "https://www.ohmanhua.com/dynamic/user/subscription?t=" + System.currentTimeMillis()
         val stringRequest = CookieRequest(url, Response.Listener {
             handleHtml(it)
             root.srlLike.isRefreshing = false
         }, Response.ErrorListener {
             root.srlLike.isRefreshing = false
             it.printStackTrace()
-        }, OhDatabase.db.getLogin().cookie)
-        VolleyQueue.addRequest(stringRequest)
+        }, user.cookie)
 
-        user = OhDatabase.db.getLogin()
+        if (user.cookie.isNotEmpty())
+            VolleyQueue.addRequest(stringRequest)
+
     }
 
     private fun handleHtml(html: String) {

@@ -14,6 +14,7 @@ import com.manhua.oh.OhDatabase
 import com.manhua.oh.R
 import com.manhua.oh.adapter.ChapterSimpleAdapter
 import com.manhua.oh.bean.Comic
+import com.manhua.oh.bean.Record
 import com.manhua.oh.bean.User
 import com.manhua.oh.request.FormRequest
 import com.manhua.oh.tool.ComicLoader
@@ -31,6 +32,11 @@ class CoverActivity : BaseActivity() {
 
         initView()
         initData()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateRecord()
     }
 
     private var href = ""
@@ -109,18 +115,15 @@ class CoverActivity : BaseActivity() {
     private lateinit var arrayAdapter: SimpleAdapter
     private val tagList: ArrayList<HashMap<String, String>> = ArrayList()
     private var user = User()
+    private var record = Record()
     private fun initData() {
         arrayAdapter = ChapterSimpleAdapter(getActivity(), tagList, R.layout.item_gridview_chapter,
                 arrayOf("tvName"), intArrayOf(R.id.tvName))
         gvTag.adapter = arrayAdapter
 
-        // 加载界面
-        loadComic(href)
-
         // 上次阅读
-        val dataId = href.replace(Constant.URL, "").replace("/", "")
         fabRead.setOnClickListener {
-            val record = OhDatabase.db.getRecordComic(dataId)
+            record = OhDatabase.db.getRecordComic(comic.dataId)
             val intent = Intent(getActivity(), ComicActivity::class.java)
             intent.putExtra("href", href + "1/${record.chapterId}.html")
             startActivity(intent)
@@ -131,6 +134,9 @@ class CoverActivity : BaseActivity() {
         if (user.likes.contains(comic.dataId)) {
             fabLike.setImageResource(R.mipmap.icon_like_solid)
         }
+
+        // 加载界面
+        loadComic(href)
     }
 
     private fun loadComic(href: String) {
@@ -159,10 +165,15 @@ class CoverActivity : BaseActivity() {
 
         val chapters = tabs[0].select("div.all_data_list > ul > li > a")
         Log.i(TAG, "chapters = ${chapters.size}")
+        tagList.clear()
         for (chapter in chapters) {
             val hashMap = HashMap<String, String>()
             hashMap["tvName"] = chapter.text()
-            hashMap["href"] = Constant.URL + chapter.attr("href")
+            val href = Constant.URL + chapter.attr("href")
+            if (href.contains("/${record.chapterId}.html")) {
+                hashMap["read"] = true.toString()
+            }
+            hashMap["href"] = href
             tagList.add(hashMap)
         }
         arrayAdapter.notifyDataSetChanged()
@@ -210,4 +221,17 @@ class CoverActivity : BaseActivity() {
         tvDate.text = comic.lastDate
         tvChapter.text = comic.lastChapter
     }
+
+    private fun updateRecord() {
+        record = OhDatabase.db.getRecordComic(comic.dataId)
+        for (hashMap in tagList) {
+            if (hashMap["href"]!!.contains("/${record.chapterId}.html")) {
+                hashMap["read"] = true.toString()
+            } else {
+                hashMap["read"] = false.toString()
+            }
+        }
+        arrayAdapter.notifyDataSetChanged()
+    }
+
 }

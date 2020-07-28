@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.manhua.oh.R
@@ -26,7 +25,6 @@ class ComicAdapter : RecyclerView.Adapter<ComicAdapter.ViewHolder> {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val ivPicture: ImageView = itemView.findViewById(R.id.ivPicture)
-        val rbRate: RatingBar = itemView.findViewById(R.id.rbRate)
         val tvTitle: TextView = itemView.findViewById(R.id.tvTitle)
         val tvVote: TextView = itemView.findViewById(R.id.tvVote)
     }

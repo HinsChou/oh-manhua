@@ -1,8 +1,10 @@
 package com.manhua.oh.activity
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
+import android.util.Base64.DEFAULT
 import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,10 +19,15 @@ import com.manhua.oh.bean.Chapter
 import com.manhua.oh.bean.Record
 import com.manhua.oh.request.CookieRequest
 import com.manhua.oh.tool.ComicLoader
+import com.manhua.oh.tool.Snack
 import com.manhua.oh.tool.VolleyQueue
 import kotlinx.android.synthetic.main.activity_comic.*
+import org.json.JSONObject
 import org.jsoup.Jsoup
 import java.net.URLEncoder
+import java.nio.charset.Charset
+import javax.crypto.Cipher
+import javax.crypto.spec.SecretKeySpec
 
 class ComicActivity : BaseActivity() {
 
@@ -38,44 +45,66 @@ class ComicActivity : BaseActivity() {
         rvComic.removeOnScrollListener(onScrollL)
     }
 
+    public fun loadPrev() {
+        if (chapter.prev.isEmpty()) {
+            Snack.show(getActivity(), getString(R.string.first))
+        } else {
+            href = chapter.prev
+            reload()
+        }
+    }
+
+    public fun loadNext() {
+        if (chapter.next.isEmpty()) {
+            Snack.show(getActivity(), getString(R.string.last))
+        } else {
+            href = chapter.prev
+            reload()
+        }
+    }
+
+    public fun toggleDirect(): Int {
+        return if (vpComic.visibility == View.VISIBLE) {
+            rvComic.visibility = View.VISIBLE
+            vpComic.visibility = View.GONE
+
+            RecyclerView.VERTICAL
+        } else {
+            rvComic.visibility = View.GONE
+            vpComic.visibility = View.VISIBLE
+
+            RecyclerView.HORIZONTAL
+        }
+    }
+
     private val bitmaps = ArrayList<Bitmap>()
     private fun initView() {
         ivBack.setOnClickListener { finish() }
         sStart.setOnClickListener {
             if (vpComic.currentItem == 0) {
-                if (chapter.prev.isEmpty()) {
-
-                } else {
-                    href = chapter.prev
-                    reload()
-                }
+                loadPrev()
             } else {
                 vpComic.currentItem = vpComic.currentItem - 1
             }
         }
         sEnd.setOnClickListener {
             if (chapter.page != 0 && vpComic.currentItem == chapter.page - 1) {
-                if (chapter.next.isEmpty()) {
-
-                } else {
-                    href = chapter.next
-                    reload()
-                }
+                loadNext()
             } else {
                 vpComic.currentItem = vpComic.currentItem + 1
             }
         }
 
-        val readAdapter = ReadAdapter(getActivity(), bitmaps)
-
+        val vpAdapter = ReadAdapter(getActivity(), bitmaps, R.layout.item_viewpager_comic)
         vpComic.orientation = ViewPager2.ORIENTATION_HORIZONTAL
-        vpComic.adapter = readAdapter
+        vpComic.adapter = vpAdapter
         onPageChangeCb = OnPageChangeCb(this)
         vpComic.registerOnPageChangeCallback(onPageChangeCb)
 
+        val rvAdapter = ReadAdapter(getActivity(), bitmaps, R.layout.item_listview_comic)
         rvComic.layoutManager =
             LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false)
-        rvComic.adapter = readAdapter
+        rvComic.adapter = rvAdapter
         onScrollL = OnScrollL(this)
         rvComic.addOnScrollListener(onScrollL)
     }
@@ -83,12 +112,15 @@ class ComicActivity : BaseActivity() {
     private fun reload() {
         chapter.page = 0
         countLoad = 1
-        vpComic.currentItem = 0
         bitmaps.clear()
-        vpComic.adapter?.notifyDataSetChanged()
-        rvComic.adapter?.notifyDataSetChanged()
+        updateAdapter()
         updatePage()
         initData()
+    }
+
+    private fun updateAdapter() {
+        rvComic.adapter?.notifyDataSetChanged()
+        vpComic.adapter?.notifyDataSetChanged()
     }
 
     private lateinit var onPageChangeCb: OnPageChangeCb
@@ -132,6 +164,7 @@ class ComicActivity : BaseActivity() {
             href = intent.getStringExtra("href")
         Log.i(TAG, "href = ${href}")
 
+        chapter = Chapter()
         var ids = href.replace(Constant.URL, "").split("/")
         val dataId = ids[1]
         val chapterId = ids[3].replace(".html", "")
@@ -140,6 +173,7 @@ class ComicActivity : BaseActivity() {
         record.chapterId = chapterId
         record.dataId = dataId
         record.userId = OhDatabase.db.getLogin().userId
+        updateRecord(0)
 
         loadComic(href)
     }
@@ -157,9 +191,33 @@ class ComicActivity : BaseActivity() {
         VolleyQueue.addRequest(stringRequest)
     }
 
-    private val chapter = Chapter()
+    private var chapter = Chapter()
     private fun handleDetail(html: String) {
         val document = Jsoup.parse(html)
+
+        // 获取页码
+        val javascripts = document.select("script")
+        var data = ""
+        for (javascript in javascripts) {
+            val text = javascript.html()
+            if (text.contains("C_DATA")) {
+                data = text.split("\'")[1];
+            }
+        }
+        var mh = decrypt(data)
+        mh = mh.substring(mh.indexOf("{"), mh.indexOf("}") + 1)
+        val jsonObject = JSONObject(mh)
+        val total = jsonObject["totalimg"].toString().toInt()
+        chapter.page = total
+        Log.i(TAG, "total = $total")
+        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.loading_0)
+        for (i in 0 until total) {
+            bitmaps.add(bitmap)
+        }
+        vpComic.currentItem = 0
+        updatePage()
+        updateAdapter()
+
         val readend = document.select("div.mh_readend")
 
         val title = readend.select("a").attr("title")
@@ -181,7 +239,9 @@ class ComicActivity : BaseActivity() {
 
         val prefix = Constant.URL + "/comic" + dataId + URLEncoder.encode(title).replace("+", "%20") + "/"
         chapter.prefix = prefix
+        Log.i(TAG, "prefix = $prefix")
 
+        // 初始化列表
         addComic()
     }
 
@@ -194,25 +254,29 @@ class ComicActivity : BaseActivity() {
         } else {
             tvTotal.setTextColor(resources.getColor(R.color.red))
         }
+        pbPage.max = bitmaps.size
+        pbPage.progress = vpComic.currentItem + 1
+        pbPage.secondaryProgress = countLoad
     }
 
     private var countLoad = 1;
     private val maxLoad = 20
     private var countRequest = 0;
     private fun addComic() {
-        val src = "${chapter.prefix}${String.format("%04d", countLoad)}.jpg"
         Log.i(
             TAG,
             "addComic: countLoad = $countLoad, size = ${bitmaps.size} countRequest = $countRequest"
         )
 
         // 单线程
-        if (countRequest >= 1 || (chapter.page != 0 && countLoad >= chapter.page)) {
+        if (countRequest >= 1 || countLoad > chapter.page) {
             pbRequest.visibility = View.GONE
             return
         }
         countRequest++
 
+        val src = "${chapter.prefix}${String.format("%04d", countLoad)}.jpg"
+        val position = countLoad - 1
         ComicLoader.loadSrc(getActivity(), src, Response.Listener {
             Log.i(TAG, "loadSrc finish = $src $countLoad")
             countRequest--
@@ -221,22 +285,12 @@ class ComicActivity : BaseActivity() {
                 updatePage()
             }
 
-            if (it == null) {
-                countLoad--
-                chapter.page = countLoad
-                updatePage()
-                Log.i(TAG, "load end = ${chapter.page}")
-            } else {
                 Log.i(TAG, "bitmap.size = ${bitmaps.size} countLoad = $countLoad")
-
-                if (countLoad <= bitmaps.size) {
-                    bitmaps[countLoad - 1] = it
-                } else {
-                    bitmaps.add(it)
-                }
+            if (it != null)
+                if (position < bitmaps.size)
+                    bitmaps[position] = it
                 Handler().postDelayed({
-                    vpComic.adapter?.notifyDataSetChanged()
-                    rvComic.adapter?.notifyDataSetChanged()
+                    updateAdapter()
                 }, 100)
 
                 Log.i(TAG, "load bitmap = $countLoad - ${vpComic.currentItem}")
@@ -244,8 +298,30 @@ class ComicActivity : BaseActivity() {
                     countLoad++
                     addComic()
                 }
-            }
         })
+    }
+
+    private fun decrypt(sSrc: String): String {
+        return try {
+            val sKey = "JRUIFMVJDIWE569j"
+            val raw = sKey.toByteArray(charset("utf-8"))
+            val skeySpec =
+                SecretKeySpec(raw, "AES")
+            val cipher =
+                Cipher.getInstance("AES/ECB/PKCS5Padding")
+            cipher.init(Cipher.DECRYPT_MODE, skeySpec)
+            // 两次解码
+            var data = android.util.Base64.decode(sSrc, DEFAULT)
+            data = android.util.Base64.decode(data, DEFAULT)
+            try {
+                val original = cipher.doFinal(data)
+                String(original, Charset.forName("utf-8"))
+            } catch (e: Exception) {
+                ";"
+            }
+        } catch (ex: Exception) {
+            ";"
+        }
     }
 
 }
