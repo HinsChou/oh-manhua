@@ -9,8 +9,8 @@
     <string name="verify">验证</string>
     <string name="login">登录</string>
     <string name="logout">注销</string>
+    <string name="record">历史记录</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="first">已经是第一章了</string>
     <string name="last">已经是最后一章了</string>
 

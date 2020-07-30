@@ -11,7 +11,6 @@ import com.manhua.oh.Constant
 import com.manhua.oh.OhDatabase
 import com.manhua.oh.R
 import com.manhua.oh.adapter.LikeSimpleAdapter
-import com.manhua.oh.bean.User
 import com.manhua.oh.request.CookieRequest
 import com.manhua.oh.tool.VolleyQueue
 import kotlinx.android.synthetic.main.fragment_like.view.*
@@ -46,10 +45,7 @@ class LikeFragment : BaseFragment() {
         root.srlLike.setOnRefreshListener { initData() }
     }
 
-    private var user = User()
     private fun initData() {
-        user = OhDatabase.db.getLogin()
-
         val url = "https://www.ohmanhua.com/dynamic/user/subscription?t=" + System.currentTimeMillis()
         val stringRequest = CookieRequest(url, Response.Listener {
             handleHtml(it)

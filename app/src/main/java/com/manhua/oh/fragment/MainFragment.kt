@@ -21,7 +21,6 @@ import com.manhua.oh.tool.VolleyQueue
 import kotlinx.android.synthetic.main.fragment_main.view.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import kotlin.concurrent.thread
 
 /**
  * A simple [Fragment] subclass.
@@ -59,24 +58,30 @@ class MainFragment : BaseFragment() {
         )
 
         root.lvGroup.adapter = groupSimpleAdapter
+
+        root.srlMain.setOnRefreshListener {
+            requestMain()
+        }
     }
 
     private fun initData() {
+        root.srlMain.isRefreshing = true
+        requestMain()
+    }
+
+    private fun requestMain() {
         val url = Constant.URL + "?t=" + System.currentTimeMillis()
         ComicLoader.refer = url
 
         val stringRequest = CookieRequest(url, Response.Listener {
-            activity?.runOnUiThread(Runnable { root.pbRequest.visibility = View.GONE })
+            activity?.runOnUiThread(Runnable { root.srlMain.isRefreshing = false })
             handleHtml(it)
         }, Response.ErrorListener {
-            Log.e(TAG, it.message)
+            it.printStackTrace()
         }, OhDatabase.db.getLogin().cookie
         )
 
-        root.pbRequest.visibility = View.VISIBLE
-        thread(start = true) {
-            VolleyQueue.addRequest(stringRequest)
-        }
+        VolleyQueue.addRequest(stringRequest)
     }
 
     private fun handleHtml(html: String) {

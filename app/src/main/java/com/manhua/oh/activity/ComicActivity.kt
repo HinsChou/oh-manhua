@@ -10,14 +10,17 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.android.volley.Request
 import com.android.volley.Response
 import com.manhua.oh.Constant
 import com.manhua.oh.OhDatabase
 import com.manhua.oh.R
 import com.manhua.oh.adapter.ReadAdapter
+import com.manhua.oh.adapter.VerticalAdapter
 import com.manhua.oh.bean.Chapter
 import com.manhua.oh.bean.Record
 import com.manhua.oh.request.CookieRequest
+import com.manhua.oh.request.FormRequest
 import com.manhua.oh.tool.ComicLoader
 import com.manhua.oh.tool.Snack
 import com.manhua.oh.tool.VolleyQueue
@@ -58,7 +61,7 @@ class ComicActivity : BaseActivity() {
         if (chapter.next.isEmpty()) {
             Snack.show(getActivity(), getString(R.string.last))
         } else {
-            href = chapter.prev
+            href = chapter.next
             reload()
         }
     }
@@ -101,7 +104,7 @@ class ComicActivity : BaseActivity() {
         onPageChangeCb = OnPageChangeCb(this)
         vpComic.registerOnPageChangeCallback(onPageChangeCb)
 
-        val rvAdapter = ReadAdapter(getActivity(), bitmaps, R.layout.item_listview_comic)
+        val rvAdapter = VerticalAdapter(getActivity(), bitmaps, R.layout.item_listview_comic)
         rvComic.layoutManager =
             LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false)
         rvComic.adapter = rvAdapter
@@ -130,10 +133,9 @@ class ComicActivity : BaseActivity() {
         ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
-            comicActivity.updatePage()
-            comicActivity.pbRequest.visibility = View.VISIBLE
-            comicActivity.addComic()
-            comicActivity.updateRecord(position)
+            if (comicActivity.rvComic.visibility != View.VISIBLE)
+                comicActivity.rvComic.scrollToPosition(position)
+            comicActivity.updateCurrent(position)
         }
     }
 
@@ -145,10 +147,21 @@ class ComicActivity : BaseActivity() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                comicActivity.pbRequest.visibility = View.VISIBLE
-                comicActivity.addComic()
+                val position =
+                    (comicActivity.rvComic.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                Log.i("zxs", "onScrollStateChanged $position")
+                if (comicActivity.vpComic.visibility != View.VISIBLE)
+                    comicActivity.vpComic.currentItem = position
+                comicActivity.updateCurrent(position)
             }
         }
+    }
+
+    private fun updateCurrent(position: Int) {
+        updatePage()
+        updateRecord(position)
+        pbRequest.visibility = View.VISIBLE
+        addComic()
     }
 
     private fun updateRecord(position: Int) {
@@ -172,7 +185,7 @@ class ComicActivity : BaseActivity() {
         record = OhDatabase.db.getRecordChapter(dataId, chapterId)
         record.chapterId = chapterId
         record.dataId = dataId
-        record.userId = OhDatabase.db.getLogin().userId
+        record.userId = user.userId
         updateRecord(0)
 
         loadComic(href)
@@ -195,16 +208,21 @@ class ComicActivity : BaseActivity() {
     private fun handleDetail(html: String) {
         val document = Jsoup.parse(html)
 
-        // 获取页码
         val javascripts = document.select("script")
-        var data = ""
+        // 获取页码
+        var dataPage = ""
+        var dataPageId = ""
         for (javascript in javascripts) {
             val text = javascript.html()
             if (text.contains("C_DATA")) {
-                data = text.split("\'")[1];
+                dataPage = text.split("\'")[1]
+            }
+
+            if (text.contains("__jsData")) {
+                dataPageId = text.replace("__jsData =", "")
             }
         }
-        var mh = decrypt(data)
+        var mh = decrypt(dataPage)
         mh = mh.substring(mh.indexOf("{"), mh.indexOf("}") + 1)
         val jsonObject = JSONObject(mh)
         val total = jsonObject["totalimg"].toString().toInt()
@@ -217,6 +235,12 @@ class ComicActivity : BaseActivity() {
         vpComic.currentItem = 0
         updatePage()
         updateAdapter()
+
+        // 获取章节id
+        val joPageId = JSONObject(dataPageId)
+        val pageId = joPageId["dataPageId"].toString()
+        chapter.pageId = pageId
+        uploadRecord(pageId)
 
         val readend = document.select("div.mh_readend")
 
@@ -243,6 +267,24 @@ class ComicActivity : BaseActivity() {
 
         // 初始化列表
         addComic()
+    }
+
+    private fun uploadRecord(pageId: String) {
+        if (user.cookie.isEmpty())
+            return
+
+        val url = "https://www.ohmanhua.com/counting"
+        val headers = HashMap<String, String>()
+        headers.put("cookie", "login_cookie=" + user.cookie)
+        val params = HashMap<String, String>()
+        params["pageId"] = pageId
+
+        val formRequest = FormRequest(Request.Method.POST, url, params, headers, Response.Listener {
+            Log.i(TAG, "$url ${it.status} ${it.message}")
+        }, Response.ErrorListener {
+            it.printStackTrace()
+        })
+        VolleyQueue.addRequest(formRequest)
     }
 
     private fun updatePage() {
@@ -285,7 +327,7 @@ class ComicActivity : BaseActivity() {
                 updatePage()
             }
 
-                Log.i(TAG, "bitmap.size = ${bitmaps.size} countLoad = $countLoad")
+            Log.i(TAG, "bitmap.size = ${bitmaps.size} countLoad = $countLoad")
             if (it != null)
                 if (position < bitmaps.size)
                     bitmaps[position] = it

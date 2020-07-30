@@ -30,9 +30,15 @@ class MenuFragment : BottomSheetDialogFragment() {
         if (activity is ComicActivity) {
             val comicActivity = activity as ComicActivity
             val ivPrev = view.findViewById<ImageView>(R.id.ivPrev)
-            ivPrev.setOnClickListener { comicActivity.loadPrev() }
+            ivPrev.setOnClickListener {
+                comicActivity.loadPrev()
+                dismiss()
+            }
             val ivNext = view.findViewById<ImageView>(R.id.ivNext)
-            ivNext.setOnClickListener { comicActivity.loadNext() }
+            ivNext.setOnClickListener {
+                comicActivity.loadNext()
+                dismiss()
+            }
 
             val ivDirect = view.findViewById<ImageView>(R.id.ivDirect)
             ivDirect.setOnClickListener {
@@ -42,8 +48,6 @@ class MenuFragment : BottomSheetDialogFragment() {
                     ivDirect.rotation = 90f
             }
         }
-
-
 
         return view
     }

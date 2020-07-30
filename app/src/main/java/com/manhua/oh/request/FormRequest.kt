@@ -8,8 +8,12 @@ import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset
 import java.util.*
 
-class FormRequest(method: Int, url: String?, private val params: HashMap<String, String>, private val headers: HashMap<String, String>,
-                  val listener: Response.Listener<Result>, errorListener: Response.ErrorListener?) :
+open class FormRequest(
+    method: Int,
+    url: String?,
+    private val params: HashMap<String, String>,
+    private val headers: HashMap<String, String>,
+    val listener: Response.Listener<Result>, errorListener: Response.ErrorListener?) :
         Request<Result>(method, url, errorListener) {
 
     private val BOUNDARY =
@@ -49,7 +53,7 @@ class FormRequest(method: Int, url: String?, private val params: HashMap<String,
      */
     @Throws(AuthFailureError::class)
     override fun getBody(): ByteArray? {
-        if (params == null || params.size <= 0) {
+        if (params.size <= 0) {
             return super.getBody()
         }
         // ------WebKitFormBoundarykR96Kta4gvMACHfq                 第一行

@@ -9,5 +9,10 @@ class BaseApplication : Application() {
         super.onCreate()
         OhDatabase.init(applicationContext)
         VolleyQueue.init(applicationContext)
+        widthPixels = resources.displayMetrics.widthPixels
+    }
+
+    companion object {
+        var widthPixels = 0
     }
 }

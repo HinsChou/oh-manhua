@@ -15,7 +15,6 @@ import com.manhua.oh.R
 import com.manhua.oh.adapter.ChapterSimpleAdapter
 import com.manhua.oh.bean.Comic
 import com.manhua.oh.bean.Record
-import com.manhua.oh.bean.User
 import com.manhua.oh.request.FormRequest
 import com.manhua.oh.tool.ComicLoader
 import com.manhua.oh.tool.VolleyQueue
@@ -114,7 +113,6 @@ class CoverActivity : BaseActivity() {
 
     private lateinit var arrayAdapter: SimpleAdapter
     private val tagList: ArrayList<HashMap<String, String>> = ArrayList()
-    private var user = User()
     private var record = Record()
     private fun initData() {
         arrayAdapter = ChapterSimpleAdapter(getActivity(), tagList, R.layout.item_gridview_chapter,

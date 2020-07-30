@@ -18,7 +18,6 @@ class VerifyRequest(
         private val listenerVerify: Response.Listener<String>?
 ) : ImageRequest(url, listener, maxWidth, maxHeight, scaleType, decodeConfig, errorListener) {
 
-
     override fun parseNetworkResponse(response: NetworkResponse?): Response<Bitmap> {
         var verifyId = ""
         for (key in response!!.headers.keys) {

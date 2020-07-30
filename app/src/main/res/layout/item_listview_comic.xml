@@ -8,6 +8,7 @@
         android:id="@+id/ivRead"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:scaleType="fitCenter"
         app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

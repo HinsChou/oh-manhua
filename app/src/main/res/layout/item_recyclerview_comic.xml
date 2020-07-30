@@ -51,6 +51,6 @@
         android:layout_marginTop="4dp"
         android:textSize="@dimen/text_size_sub"
         android:maxLines="1"
-        android:text="0" />
+        android:textColor="@color/colorTextHint" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
