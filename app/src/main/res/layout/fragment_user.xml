@@ -10,13 +10,13 @@
         android:id="@+id/mcvHead"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
         app:cardBackgroundColor="@color/transparent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
 
         <ImageView
             android:id="@+id/ivHead"
@@ -25,23 +25,113 @@
             android:src="@mipmap/ic_launcher" />
     </com.google.android.material.card.MaterialCardView>
 
-
     <TextView
-        android:id="@+id/tvName"
+        android:id="@+id/tvNickName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toTopOf="@id/mcvHead"
+        app:layout_constraintStart_toEndOf="@id/mcvHead"
+        android:layout_margin="@dimen/padding"
         android:textSize="@dimen/text_size_title"
-        android:textColor="@color/colorAccent"
         app:layout_constraintTop_toBottomOf="@id/mcvHead" />
+
+    <TextView
+        android:id="@+id/tvUserId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/mcvHead"
+        android:layout_margin="@dimen/padding"
+        android:background="@drawable/shape_tag"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/tvNickName" />
+
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/tvUserId"
+        app:layout_constraintStart_toEndOf="@id/tvUserId"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/colorTextHint" />
+
+
+    <TextView
+        android:id="@+id/tvLike"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/mcvHead"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvRead"
+        android:textColor="@color/red"
+        android:textSize="24sp"
+        android:text="0"/>
+
+    <TextView
+        android:id="@+id/tvRead"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/mcvHead"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toEndOf="@id/tvLike"
+        app:layout_constraintEnd_toStartOf="@id/tvComment"
+        android:textColor="@color/green"
+        android:textSize="24sp"
+        android:text="0"/>
+
+    <TextView
+        android:id="@+id/tvComment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/mcvHead"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toEndOf="@id/tvRead"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="@color/orange"
+        android:textSize="24sp"
+        android:text="0"/>
+
+    <TextView
+        android:id="@+id/tvLikeSub"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvLike"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvRead"
+        android:text="@string/like"/>
+
+    <TextView
+        android:id="@+id/tvReadSub"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvRead"
+        android:gravity="center"
+        app:layout_constraintStart_toEndOf="@id/tvLike"
+        app:layout_constraintEnd_toStartOf="@id/tvComment"
+        android:text="@string/read"/>
+
+    <TextView
+        android:id="@+id/tvCommentSub"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/tvComment"
+        android:gravity="center"
+        app:layout_constraintStart_toEndOf="@id/tvRead"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/comment"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clRecord"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/tvName">
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tvLikeSub">
 
         <TextView
             android:id="@+id/tvRecord"
@@ -49,126 +139,28 @@
             android:layout_height="wrap_content"
             android:text="@string/record"
             android:textSize="@dimen/text_size_title"
-            android:paddingStart="16dp"
+            android:layout_marginStart="@dimen/padding"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvRecord"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             app:layout_constraintTop_toBottomOf="@id/tvRecord" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/clSignIn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/tvName">
-
-        <EditText
-            android:id="@+id/etUsername"
-            android:layout_width="match_parent"
-            android:layout_marginStart="48dp"
-            android:layout_marginEnd="48dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="32dp"
-            android:inputType="text"
-            android:maxLines="1"
-            android:paddingStart="48dp"
-            android:paddingEnd="16dp"
-            android:text="hins"
-            android:background="@drawable/shape_chapter"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:layout_width="33dp"
-            android:layout_height="32dp"
-            android:src="@mipmap/icon_user"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toStartOf="@id/etUsername"
-            app:layout_constraintTop_toTopOf="@id/etUsername"
-            app:layout_constraintBottom_toBottomOf="@id/etUsername" />
-
-
-        <EditText
-            android:id="@+id/etPassword"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginStart="48dp"
-            android:layout_marginEnd="48dp"
-            android:layout_marginTop="32dp"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:paddingStart="48dp"
-            android:paddingEnd="16dp"
-            android:text="zhou0828oh"
-            android:background="@drawable/shape_chapter"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etUsername" />
-
-
-        <ImageView
-            android:layout_width="33dp"
-            android:layout_height="32dp"
-            android:src="@mipmap/icon_pass"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toStartOf="@id/etPassword"
-            app:layout_constraintTop_toTopOf="@id/etPassword"
-            app:layout_constraintBottom_toBottomOf="@id/etPassword" />
-
-        <EditText
-            android:id="@+id/etVerify"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="32dp"
-            android:inputType="number"
-            android:maxLines="1"
-            android:paddingStart="48dp"
-            android:paddingEnd="16dp"
-            android:background="@drawable/shape_chapter"
-            android:layout_marginStart="48dp"
-            android:layout_marginEnd="48dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/etPassword" />
-
-        <ImageView
-            android:layout_width="33dp"
-            android:layout_height="32dp"
-            android:src="@mipmap/icon_verify"
-            android:layout_marginStart="8dp"
-            app:layout_constraintStart_toStartOf="@id/etVerify"
-            app:layout_constraintTop_toTopOf="@id/etVerify"
-            app:layout_constraintBottom_toBottomOf="@id/etVerify" />
-
-        <ImageView
-            android:id="@+id/ivVerify"
-            android:layout_width="96dp"
-            android:layout_height="0dp"
-            android:layout_margin="4dp"
-            android:focusable="true"
-            android:clickable="true"
-            app:layout_constraintEnd_toEndOf="@id/etVerify"
-            app:layout_constraintTop_toTopOf="@id/etVerify"
-            app:layout_constraintBottom_toBottomOf="@id/etVerify" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginEnd="16dp"
         android:src="@mipmap/icon_enter"
-        app:layout_constraintTop_toBottomOf="@id/clSignIn"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:backgroundTint="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/mcvHead"
+        app:layout_constraintBottom_toBottomOf="@id/mcvHead"
         app:tint="@color/white" />
 
 

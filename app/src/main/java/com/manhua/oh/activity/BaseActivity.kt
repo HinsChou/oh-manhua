@@ -3,7 +3,7 @@ package com.manhua.oh.activity
 import android.os.Build
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.manhua.oh.OhDatabase
+import com.manhua.oh.database.OhDatabase
 import com.manhua.oh.R
 
 open class BaseActivity : AppCompatActivity() {

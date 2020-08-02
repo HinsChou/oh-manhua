@@ -8,12 +8,15 @@ import android.view.ViewGroup
 import android.widget.SimpleAdapter
 import com.android.volley.Response
 import com.manhua.oh.Constant
-import com.manhua.oh.OhDatabase
+import com.manhua.oh.database.OhDatabase
 import com.manhua.oh.R
+import com.manhua.oh.activity.MainActivity
 import com.manhua.oh.adapter.LikeSimpleAdapter
+import com.manhua.oh.bean.Comic
 import com.manhua.oh.request.CookieRequest
 import com.manhua.oh.tool.VolleyQueue
 import kotlinx.android.synthetic.main.fragment_like.view.*
+import kotlinx.android.synthetic.main.fragment_user.*
 import org.jsoup.Jsoup
 
 /**
@@ -34,18 +37,18 @@ class LikeFragment : BaseFragment() {
         return root
     }
 
-
     private val arrayList = ArrayList<HashMap<String, String>>()
     private lateinit var simpleAdapter: SimpleAdapter
     private fun initView() {
         simpleAdapter = LikeSimpleAdapter(activity as Context, arrayList, R.layout.item_gridview_like,
-                arrayOf("tvName", "tvLast", "tvDate"), intArrayOf(R.id.tvName, R.id.tvLast, R.id.tvDate))
+                arrayOf("tvTitle", "tvChapter", "tvDate"), intArrayOf(R.id.tvTitle, R.id.tvChapter, R.id.tvDate))
         root.gvLike.adapter = simpleAdapter
 
         root.srlLike.setOnRefreshListener { initData() }
     }
 
-    private fun initData() {
+     fun initData() {
+        user = OhDatabase.db.getLogin()
         val url = "https://www.ohmanhua.com/dynamic/user/subscription?t=" + System.currentTimeMillis()
         val stringRequest = CookieRequest(url, Response.Listener {
             handleHtml(it)
@@ -57,6 +60,8 @@ class LikeFragment : BaseFragment() {
 
         if (user.cookie.isNotEmpty())
             VolleyQueue.addRequest(stringRequest)
+        else if(root.srlLike.isRefreshing)
+            root.srlLike.isRefreshing = false
 
     }
 
@@ -69,33 +74,48 @@ class LikeFragment : BaseFragment() {
         arrayList.clear()
         for (like in likes) {
             val hashMap = HashMap<String, String>()
-
             val spans = like.select("span")
-            val a = spans[1].select("a")
-            val title = a.text()
-            hashMap["tvName"] = title
 
+            val a = spans[1].select("a")
             val href = a.attr("href")
             val dataId = href.replace("/", "")
+            // 获取本地数据
+            val comic = OhDatabase.db.getComic(dataId)
+            comic.dataId = dataId
+
+            val dataLongId = spans[0].select("input.fed-form-comp").attr("value")
+            comic.dataLongId = dataLongId
+
+            val title = a.text()
+            hashMap["tvTitle"] = title
+            comic.title = title
+
             if (!user.likes.contains(dataId))
                 user.likes += "$dataId,"
 
-            var src = Constant.URL + "/comic/" + dataId + "/cover.jpg"
+            val src = Constant.URL + "/comic/" + dataId + "/cover.jpg"
             hashMap["src"] = src
+            comic.src = src
 
             hashMap["href"] = Constant.URL + href
+            comic.href = Constant.URL + href
 
             val last = spans[2].text()
-            hashMap["tvLast"] = last
+            hashMap["tvChapter"] = last
+            comic.lastChapter = last
 
             val date = spans[3].text()
             hashMap["tvDate"] = date
+            comic.lastDate = date
 
+            OhDatabase.db.ohDao().insertComic(comic)
             arrayList.add(hashMap)
         }
-        OhDatabase.db.userDao().update(user)
-
+        OhDatabase.db.ohDao().updateUser(user)
         simpleAdapter.notifyDataSetChanged()
+
+        // 刷新我的喜欢数量
+        (activity as MainActivity).userFragment.tvLike.text = arrayList.size.toString()
     }
 
 }

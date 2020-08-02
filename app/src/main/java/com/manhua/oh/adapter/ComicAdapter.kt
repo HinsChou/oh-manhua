@@ -14,19 +14,13 @@ import com.manhua.oh.bean.Comic
 import com.manhua.oh.tool.ComicLoader
 
 
-class ComicAdapter : RecyclerView.Adapter<ComicAdapter.ViewHolder> {
-    var context: Context
-    var comicList: List<Comic>
-
-    constructor(context: Context, comicList: ArrayList<Comic>) {
-        this.context = context
-        this.comicList = comicList
-    }
+class ComicAdapter (private val context: Context, private val comicList: ArrayList<Comic>) :
+    RecyclerView.Adapter<ComicAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val ivPicture: ImageView = itemView.findViewById(R.id.ivPicture)
+        val ivCover: ImageView = itemView.findViewById(R.id.ivCover)
         val tvTitle: TextView = itemView.findViewById(R.id.tvTitle)
-        val tvVote: TextView = itemView.findViewById(R.id.tvVote)
+        val tvChapter: TextView = itemView.findViewById(R.id.tvChapter)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -41,12 +35,11 @@ class ComicAdapter : RecyclerView.Adapter<ComicAdapter.ViewHolder> {
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val comic = comicList[position]
 
-        ComicLoader.loadSrc(context, comic.src, holder.ivPicture)
-//        holder.rbRate.rating = comic.rate
+        ComicLoader.loadSrc(context, comic.src, holder.ivCover)
         holder.tvTitle.text = comic.title
-        holder.tvVote.text = comic.lastChapter
+        holder.tvChapter.text = comic.lastChapter
 
-        holder.ivPicture.setOnClickListener {
+        holder.ivCover.setOnClickListener {
             val intent = Intent(context, CoverActivity::class.java)
             intent.putExtra("href", comic.href)
             intent.putExtra("title", comic.title)

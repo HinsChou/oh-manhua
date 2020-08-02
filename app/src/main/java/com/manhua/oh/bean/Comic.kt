@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-class Comic() {
+class Comic {
     @PrimaryKey(autoGenerate = true)
     var id = 0
 
@@ -13,10 +13,10 @@ class Comic() {
     var title = "" // 标题
 
     @ColumnInfo
-    var src = "" // 封面
+    var src = "" // 封面地址
 
     @ColumnInfo
-    var href = "" // 链接
+    var href = "" // 页面地址
 
     @ColumnInfo
     var type = "" // 类型
@@ -31,22 +31,17 @@ class Comic() {
     var lastDate = "" // 最后日期
 
     @ColumnInfo
-    var lastChapter = "" // 最后章节
-
-    var lastHref = ""
+    var lastChapter = "" // 最新章节
 
     @ColumnInfo
-    var chapter = 0 // 章节数
+    var lastHref = "" // 最新章节地址
 
     @ColumnInfo
-    var brief = ""
+    var brief = "" // 简介
 
     @ColumnInfo
     var dataId = "" // 漫画id
 
-    var readChapter = ""
-
-    var readTime = ""
-
-    var readHref = ""
+    @ColumnInfo
+    var dataLongId = "" // 取消收藏的id
 }

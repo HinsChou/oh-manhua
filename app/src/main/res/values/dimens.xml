@@ -3,8 +3,8 @@
     <dimen name="text_size_sub">12sp</dimen>
     <dimen name="text_size_title">16sp</dimen>
 
-    <dimen name="cover_width_small">90dp</dimen>
-    <dimen name="cover_height_small">120dp</dimen>
+    <dimen name="cover_width_small">108dp</dimen>
+    <dimen name="cover_height_small">144dp</dimen>
 
     <dimen name="cover_width">120dp</dimen>
     <dimen name="cover_height">160dp</dimen>
@@ -12,5 +12,6 @@
     <integer name="column_like">3</integer>
 
     <dimen name="padding">8dp</dimen>
+    <dimen name="padding_small">4dp</dimen>
 
 </resources>

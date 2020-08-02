@@ -1,9 +1,9 @@
 package com.manhua.oh.fragment
 
 import androidx.fragment.app.Fragment
-import com.manhua.oh.OhDatabase
+import com.manhua.oh.database.OhDatabase
 
 open class BaseFragment : Fragment() {
     public val TAG = javaClass.simpleName;
-    val user = OhDatabase.db.getLogin()
+    var user = OhDatabase.db.getLogin()
 }

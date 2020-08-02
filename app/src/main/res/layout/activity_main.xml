@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".activity.MainActivity">
 
-
     <FrameLayout
         android:id="@+id/flMain"
         android:layout_width="match_parent"
@@ -18,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         app:layout_constraintBottom_toTopOf="@id/babMenu"
-        android:background="@color/colorAccent" />
+        android:background="@android:color/darker_gray" />
 
     <LinearLayout
         android:id="@+id/babMenu"
@@ -33,6 +32,7 @@
             android:layout_height="match_parent"
             android:padding="12dp"
             android:visibility="visible"
+            android:tint="@color/blue"
             android:src="@mipmap/icon_home_solid" />
 
         <ImageView
@@ -41,13 +41,8 @@
             android:layout_weight="1"
             android:layout_height="match_parent"
             android:padding="12dp"
+            android:tint="@color/colorSub"
             android:src="@mipmap/icon_tag_stroke" />
-
-        <Space
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:visibility="gone"
-            android:layout_height="match_parent" />
 
         <ImageView
             android:id="@+id/ivLike"
@@ -55,6 +50,7 @@
             android:layout_weight="1"
             android:padding="12dp"
             android:layout_height="match_parent"
+            android:tint="@color/colorSub"
             android:src="@mipmap/icon_like_stroke" />
 
         <ImageView
@@ -63,6 +59,7 @@
             android:layout_weight="1"
             android:padding="12dp"
             android:visibility="visible"
+            android:tint="@color/colorSub"
             android:layout_height="match_parent"
             android:src="@mipmap/icon_my_stroke" />
     </LinearLayout>

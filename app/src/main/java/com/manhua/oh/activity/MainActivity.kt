@@ -1,6 +1,7 @@
 package com.manhua.oh.activity
 
 import android.Manifest
+import android.content.res.ColorStateList
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import com.manhua.oh.Constant
@@ -23,18 +24,22 @@ class MainActivity : BaseActivity() {
         fabMain.setOnClickListener {
             showFragment(mainFragment)
             fabMain.setImageResource(R.mipmap.icon_home_solid)
+            fabMain.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.blue))
         }
         ivLike.setOnClickListener {
             showFragment(likeFragment)
             ivLike.setImageResource(R.mipmap.icon_like_solid)
+            ivLike.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.red))
         }
         ivUser.setOnClickListener {
             showFragment(userFragment)
             ivUser.setImageResource(R.mipmap.icon_my_solid)
+            ivUser.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.green))
         }
         ivSearch.setOnClickListener {
             showFragment(searchFragment)
             ivSearch.setImageResource(R.mipmap.icon_tag_solid)
+            ivSearch.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.orange))
         }
     }
 
@@ -43,14 +48,18 @@ class MainActivity : BaseActivity() {
         lastFragment = fragment
 
         fabMain.setImageResource(R.mipmap.icon_home_stroke)
+        fabMain.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.colorSub))
         ivLike.setImageResource(R.mipmap.icon_like_stroke)
+        ivLike.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.colorSub))
         ivUser.setImageResource(R.mipmap.icon_my_stroke)
+        ivUser.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.colorSub))
         ivSearch.setImageResource(R.mipmap.icon_tag_stroke)
+        ivSearch.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.colorSub))
     }
 
     private val mainFragment = MainFragment()
-    private val likeFragment = LikeFragment()
-    private val userFragment = UserFragment()
+    val likeFragment = LikeFragment()
+    val userFragment = UserFragment()
     private val searchFragment = SearchFragment()
 
     private var lastFragment: BaseFragment = mainFragment

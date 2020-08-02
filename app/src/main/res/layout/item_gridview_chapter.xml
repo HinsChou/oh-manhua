@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/shape_chapter"
-        android:padding="4dp"
+        android:padding="@dimen/padding_small"
         android:maxLines="1"
         android:gravity="start|center_vertical"
         android:text="@string/app_name"

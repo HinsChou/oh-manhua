@@ -1,6 +1,7 @@
 package com.manhua.oh
 
 import android.app.Application
+import com.manhua.oh.database.OhDatabase
 import com.manhua.oh.tool.VolleyQueue
 
 class BaseApplication : Application() {

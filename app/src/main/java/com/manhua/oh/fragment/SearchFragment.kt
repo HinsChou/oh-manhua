@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import com.android.volley.Response
 import com.manhua.oh.Constant
-import com.manhua.oh.OhDatabase
+import com.manhua.oh.database.OhDatabase
 import com.manhua.oh.R
 import com.manhua.oh.adapter.SearchSimpleAdapter
 import com.manhua.oh.request.CookieRequest

@@ -7,6 +7,7 @@
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/srlMain"
+        android:paddingTop="16dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -14,9 +15,7 @@
             android:id="@+id/lvGroup"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@color/transparent"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="16dp" />
+            android:divider="@color/transparent" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

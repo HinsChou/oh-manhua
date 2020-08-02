@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 class Record {
-
     @PrimaryKey(autoGenerate = true)
     var id = 0
 
@@ -20,8 +19,8 @@ class Record {
     var chapterId = "1" // 章节id
 
     @ColumnInfo
-    var timestamp = 0L
+    var timestamp = 0L // 阅读时间
 
     @ColumnInfo
-    var page = 0
+    var page = 0 // 阅读页码
 }

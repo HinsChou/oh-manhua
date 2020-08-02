@@ -33,6 +33,7 @@ object ComicLoader {
         val file = File(path)
 //        Log.i(TAG, "path = $path")
 
+        val isCover = path.endsWith("/cover.jpg")
         if (hashMap.containsKey(path)) {
             // 从缓存获取
 //            Log.i(TAG, "bitmap from hashMap")
@@ -44,7 +45,7 @@ object ComicLoader {
 //            Log.i(TAG, "bitmap from file")
             val bitmap = BitmapFactory.decodeFile(file.absolutePath)
             imageView?.setImageBitmap(bitmap)
-            hashMap[file.absolutePath] = bitmap
+            if(isCover) hashMap[path] = bitmap
             listener.onResponse(bitmap)
         } else {
             if (imageView != null) {
@@ -53,14 +54,11 @@ object ComicLoader {
                 animationDrawable.start()
             }
             // 从网络获取
-            val imageRequest = ImageRequest(
-                    src, Response.Listener {
+            val imageRequest = ImageRequest(src, Response.Listener {
 //                    Log.i(TAG, "bitmap from request")
-                (context as Activity).runOnUiThread {
-                    imageView?.setImageBitmap(it)
-                }
+                (context as Activity).runOnUiThread { imageView?.setImageBitmap(it) }
                 saveBitmap(context, it, file)
-                hashMap[file.absolutePath] = it
+                if(isCover) hashMap[path] = it
                 listener.onResponse(it)
             },
                     0,
@@ -68,6 +66,10 @@ object ComicLoader {
                     ImageView.ScaleType.CENTER_CROP,
                     Bitmap.Config.ARGB_8888,
                     Response.ErrorListener {
+                        val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.loading_0)
+                        hashMap[path] = bitmap
+                        if(imageView != null)
+                            imageView.setImageResource(R.drawable.loading_0)
                         it.printStackTrace()
                         listener.onResponse(null)
                     }

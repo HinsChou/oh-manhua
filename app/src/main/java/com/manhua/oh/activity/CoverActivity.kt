@@ -9,14 +9,16 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayout
 import com.manhua.oh.Constant
-import com.manhua.oh.OhDatabase
+import com.manhua.oh.database.OhDatabase
 import com.manhua.oh.R
 import com.manhua.oh.adapter.ChapterSimpleAdapter
 import com.manhua.oh.bean.Comic
 import com.manhua.oh.bean.Record
 import com.manhua.oh.request.FormRequest
 import com.manhua.oh.tool.ComicLoader
+import com.manhua.oh.tool.Snack
 import com.manhua.oh.tool.VolleyQueue
 import kotlinx.android.synthetic.main.activity_cover.*
 import kotlinx.android.synthetic.main.fragment_like.*
@@ -43,7 +45,9 @@ class CoverActivity : BaseActivity() {
         href = intent.getStringExtra("href")
         val title = intent.getStringExtra("title")
 
-        comic.dataId = href.replace(Constant.URL, "").replace("/", "")
+        val dataId = href.replace(Constant.URL, "").replace("/", "")
+        comic = OhDatabase.db.getComic(dataId)
+        comic.dataId = dataId
 //        ComicLoader.loadSrc(getActivity(), comic.src, ivCover)
         tvTitle.text = title
 //        tvAuthor.text = comic.author
@@ -57,6 +61,28 @@ class CoverActivity : BaseActivity() {
             else
                 likeComic()
         }
+
+        onTabSelected.setTabs(arrayOf(tvBrief, gvTag))
+        tlOther.addOnTabSelectedListener(onTabSelected)
+    }
+
+    private val onTabSelected = object : TabLayout.OnTabSelectedListener {
+        private lateinit var tabs : Array<View>
+        fun setTabs(tabs : Array<View>){
+            this.tabs = tabs
+        }
+
+        override fun onTabReselected(tab: TabLayout.Tab?) {
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab?) {
+            tabs[tab!!.position].visibility = View.GONE
+        }
+
+        override fun onTabSelected(tab: TabLayout.Tab?) {
+            tabs[tab!!.position].visibility = View.VISIBLE
+        }
+
     }
 
     private fun likeComic() {
@@ -65,14 +91,14 @@ class CoverActivity : BaseActivity() {
         params["dataId"] = comic.dataId
 
         val headers = HashMap<String, String>()
-        headers["cookie"] = "login_cookie=" + OhDatabase.db.getLogin().cookie
+        headers["cookie"] = "login_cookie=" + user.cookie
 
         val formRequest = FormRequest(Request.Method.POST, url, params, headers, Response.Listener {
             if (it.status == "S") {
                 fabLike.setImageResource(R.mipmap.icon_like_solid)
                 if (!user.likes.contains(comic.dataId)) {
                     user.likes += "${comic.dataId},"
-                    OhDatabase.db.userDao().update(user)
+                    OhDatabase.db.ohDao().updateUser(user)
                 }
             } else {
                 Snackbar.make(gvLike, it.message, Snackbar.LENGTH_LONG).show()
@@ -87,7 +113,7 @@ class CoverActivity : BaseActivity() {
     private fun hateComic() {
         val url = "https://www.ohmanhua.com/dynamic/user/subscriptionHandle"
         val params = HashMap<String, String>()
-        params["dataIds"] = comic.dataId
+        params["dataIds"] = comic.dataLongId
         params["type"] = "1"
 
         val headers = HashMap<String, String>()
@@ -99,10 +125,10 @@ class CoverActivity : BaseActivity() {
 
                 if (!user.likes.contains(comic.dataId)) {
                     user.likes = user.likes.replace("${comic.dataId},", "")
-                    OhDatabase.db.userDao().update(user)
+                    OhDatabase.db.ohDao().updateUser(user)
                 }
             } else {
-                Snackbar.make(gvLike, it.message, Snackbar.LENGTH_LONG).show()
+                Snack.show(getActivity(), it.message)
             }
         },
                 Response.ErrorListener {
@@ -129,8 +155,12 @@ class CoverActivity : BaseActivity() {
 
         // 刷新收藏
         user = OhDatabase.db.getLogin()
-        if (user.likes.contains(comic.dataId)) {
-            fabLike.setImageResource(R.mipmap.icon_like_solid)
+        if (user.likes.contains("${comic.dataId},")) {
+            if(comic.dataLongId.isEmpty()){
+                fabLike.visibility = View.INVISIBLE
+            }else{
+                fabLike.setImageResource(R.mipmap.icon_like_solid)
+            }
         }
 
         // 加载界面
@@ -148,7 +178,7 @@ class CoverActivity : BaseActivity() {
         VolleyQueue.addRequest(stringRequest)
     }
 
-    private val comic = Comic()
+    private var comic = Comic()
     private fun handleDetail(html: String) {
         val document = Jsoup.parse(html)
 
@@ -161,7 +191,7 @@ class CoverActivity : BaseActivity() {
         tvBrief.text = brief
         comic.brief = brief
 
-        val chapters = tabs[0].select("div.all_data_list > ul > li > a")
+        val chapters = tabs[0].select("div.fed-visible > div.all_data_list > ul > li > a")
         Log.i(TAG, "chapters = ${chapters.size}")
         tagList.clear()
         for (chapter in chapters) {

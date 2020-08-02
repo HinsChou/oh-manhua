@@ -31,7 +31,7 @@ class LikeSimpleAdapter(
         view.setOnClickListener {
             val intent = Intent(context, CoverActivity::class.java)
             intent.putExtra("href", href)
-            intent.putExtra("title", hm["tvName"])
+            intent.putExtra("title", hm["tvTitle"])
             context.startActivity(intent)
         }
 

@@ -13,7 +13,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.android.volley.Request
 import com.android.volley.Response
 import com.manhua.oh.Constant
-import com.manhua.oh.OhDatabase
+import com.manhua.oh.database.OhDatabase
 import com.manhua.oh.R
 import com.manhua.oh.adapter.ReadAdapter
 import com.manhua.oh.adapter.VerticalAdapter
@@ -87,14 +87,14 @@ class ComicActivity : BaseActivity() {
             if (vpComic.currentItem == 0) {
                 loadPrev()
             } else {
-                vpComic.currentItem = vpComic.currentItem - 1
+                updateCurrent(vpComic.currentItem - 1)
             }
         }
         sEnd.setOnClickListener {
             if (chapter.page != 0 && vpComic.currentItem == chapter.page - 1) {
                 loadNext()
             } else {
-                vpComic.currentItem = vpComic.currentItem + 1
+                updateCurrent(vpComic.currentItem + 1)
             }
         }
 
@@ -133,8 +133,6 @@ class ComicActivity : BaseActivity() {
         ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
-            if (comicActivity.rvComic.visibility != View.VISIBLE)
-                comicActivity.rvComic.scrollToPosition(position)
             comicActivity.updateCurrent(position)
         }
     }
@@ -150,16 +148,21 @@ class ComicActivity : BaseActivity() {
                 val position =
                     (comicActivity.rvComic.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
                 Log.i("zxs", "onScrollStateChanged $position")
-                if (comicActivity.vpComic.visibility != View.VISIBLE)
-                    comicActivity.vpComic.currentItem = position
                 comicActivity.updateCurrent(position)
             }
         }
     }
 
-    private fun updateCurrent(position: Int) {
+    private var current = 0
+    fun updateCurrent(position: Int) {
+        if(current == position)
+            return
+
+        current = position
+        vpComic.currentItem = position
+        rvComic.smoothScrollToPosition(position)
         updatePage()
-        updateRecord(position)
+//        updateRecord(position)
         pbRequest.visibility = View.VISIBLE
         addComic()
     }
@@ -167,7 +170,7 @@ class ComicActivity : BaseActivity() {
     private fun updateRecord(position: Int) {
         record.page = position
         record.timestamp = System.currentTimeMillis()
-        OhDatabase.db.recordDao().insert(record)
+        OhDatabase.db.ohDao().insertRecord(record)
     }
 
     private var href = ""
@@ -317,7 +320,9 @@ class ComicActivity : BaseActivity() {
         }
         countRequest++
 
-        val src = "${chapter.prefix}${String.format("%04d", countLoad)}.jpg"
+        var page = "0000$countLoad"
+        page = page.substring(page.length - 4, page.length)
+        val src = "${chapter.prefix}$page.jpg"
         val position = countLoad - 1
         ComicLoader.loadSrc(getActivity(), src, Response.Listener {
             Log.i(TAG, "loadSrc finish = $src $countLoad")

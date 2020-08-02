@@ -3,9 +3,10 @@
     <dimen name="text_size_sub">14sp</dimen>
     <dimen name="text_size_title">18sp</dimen>
 
-    <dimen name="cover_width_small">150dp</dimen>
-    <dimen name="cover_height_small">200dp</dimen>
+    <dimen name="cover_width_small">165dp</dimen>
+    <dimen name="cover_height_small">220dp</dimen>
 
     <dimen name="padding">16dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
 
 </resources>

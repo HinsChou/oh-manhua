@@ -6,7 +6,6 @@ import androidx.room.PrimaryKey
 
 @Entity
 class User {
-
     @PrimaryKey(autoGenerate = true)
     var id = 0
 
@@ -27,10 +26,5 @@ class User {
 
     @ColumnInfo
     var likes = ""
-
-    override fun toString(): String {
-        return "User(userId='$userId', cookie='$cookie', nickName='$nickName')"
-    }
-
 
 }

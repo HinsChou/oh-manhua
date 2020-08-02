@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.android.volley.Response
 import com.manhua.oh.Constant
-import com.manhua.oh.OhDatabase
+import com.manhua.oh.database.OhDatabase
 import com.manhua.oh.R
 import com.manhua.oh.adapter.GroupSimpleAdapter
 import com.manhua.oh.bean.Comic
@@ -108,13 +108,13 @@ class MainFragment : BaseFragment() {
             val group = Group()
 
             val xvi = home.select("h2.fed-font-xvi").text()
-            Log.i(TAG, "xvi = $xvi")
+//            Log.i(TAG, "xvi = $xvi")
             group.name = xvi
 
             val more = home.select("a.fed-more")
             val text = more.text()
             val href = more.attr("href")
-            Log.i(TAG, "more = $text[$href]")
+//            Log.i(TAG, "more = $text[$href]")
             group.more = text
             group.href = href
 
