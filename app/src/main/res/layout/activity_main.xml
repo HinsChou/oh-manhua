@@ -17,7 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         app:layout_constraintBottom_toTopOf="@id/babMenu"
-        android:background="@android:color/darker_gray" />
+        android:background="@color/colorLoading" />
 
     <LinearLayout
         android:id="@+id/babMenu"

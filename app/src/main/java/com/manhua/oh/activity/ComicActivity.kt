@@ -46,6 +46,7 @@ class ComicActivity : BaseActivity() {
         super.onDestroy()
         vpComic.unregisterOnPageChangeCallback(onPageChangeCb)
         rvComic.removeOnScrollListener(onScrollL)
+        countRequest = 1
     }
 
     public fun loadPrev() {
@@ -75,7 +76,6 @@ class ComicActivity : BaseActivity() {
         } else {
             rvComic.visibility = View.GONE
             vpComic.visibility = View.VISIBLE
-
             RecyclerView.HORIZONTAL
         }
     }
@@ -87,14 +87,18 @@ class ComicActivity : BaseActivity() {
             if (vpComic.currentItem == 0) {
                 loadPrev()
             } else {
-                updateCurrent(vpComic.currentItem - 1)
+                val position = vpComic.currentItem - 1
+                updateCurrent(position)
+                updateVisible()
             }
         }
         sEnd.setOnClickListener {
             if (chapter.page != 0 && vpComic.currentItem == chapter.page - 1) {
                 loadNext()
             } else {
-                updateCurrent(vpComic.currentItem + 1)
+                val position = vpComic.currentItem + 1
+                updateCurrent(position)
+                updateVisible()
             }
         }
 
@@ -134,6 +138,8 @@ class ComicActivity : BaseActivity() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
             comicActivity.updateCurrent(position)
+            if(comicActivity.rvComic.visibility != View.VISIBLE)
+                comicActivity.rvComic.scrollToPosition(position)
         }
     }
 
@@ -145,26 +151,28 @@ class ComicActivity : BaseActivity() {
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             super.onScrollStateChanged(recyclerView, newState)
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                val position =
-                    (comicActivity.rvComic.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                val position = (comicActivity.rvComic.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
                 Log.i("zxs", "onScrollStateChanged $position")
                 comicActivity.updateCurrent(position)
+                if(comicActivity.vpComic.visibility != View.VISIBLE)
+                    comicActivity.vpComic.setCurrentItem(position, false)
             }
         }
     }
 
-    private var current = 0
+    var current = 0
     fun updateCurrent(position: Int) {
-        if(current == position)
-            return
-
         current = position
-        vpComic.currentItem = position
-        rvComic.smoothScrollToPosition(position)
         updatePage()
-//        updateRecord(position)
         pbRequest.visibility = View.VISIBLE
         addComic()
+    }
+
+    fun updateVisible(){
+        if(vpComic.visibility == View.VISIBLE)
+            vpComic.currentItem = current
+        if(rvComic.visibility == View.VISIBLE)
+            rvComic.smoothScrollToPosition(current)
     }
 
     private fun updateRecord(position: Int) {
@@ -350,7 +358,7 @@ class ComicActivity : BaseActivity() {
 
     private fun decrypt(sSrc: String): String {
         return try {
-            val sKey = "JRUIFMVJDIWE569j"
+            val sKey = "fw12558899ertyui"
             val raw = sKey.toByteArray(charset("utf-8"))
             val skeySpec =
                 SecretKeySpec(raw, "AES")

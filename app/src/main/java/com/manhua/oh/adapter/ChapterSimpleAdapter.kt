@@ -10,14 +10,12 @@ import com.manhua.oh.R
 import com.manhua.oh.activity.ComicActivity
 
 class ChapterSimpleAdapter(
-        context: Context,
-        data: MutableList<out MutableMap<String, String>>,
+        private val context: Context,
+        private val data: MutableList<out MutableMap<String, String>>,
         resource: Int,
         from: Array<out String>?,
         to: IntArray?
 ) : SimpleAdapter(context, data, resource, from, to) {
-    private val context = context
-    private val data = data
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view = super.getView(position, convertView, parent)

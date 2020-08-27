@@ -17,7 +17,7 @@
     <item>
         <shape>
             <corners android:radius="4dp" />
-            <stroke android:color="@color/colorLoading" android:width="1dp" />
+            <stroke android:color="@color/colorSub" android:width="1dp" />
         </shape>
     </item>
 </selector>

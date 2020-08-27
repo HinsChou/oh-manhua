@@ -12,6 +12,7 @@ import com.android.volley.Response
 import com.manhua.oh.Constant
 import com.manhua.oh.database.OhDatabase
 import com.manhua.oh.R
+import com.manhua.oh.activity.MainActivity
 import com.manhua.oh.adapter.ComicAdapter
 import com.manhua.oh.bean.Comic
 import com.manhua.oh.request.CookieRequest
@@ -110,7 +111,7 @@ class UserFragment : BaseFragment() {
 
             val readTime = spans[2].text()
 
-            val readChapter = spans[3].text()
+//            val readChapter = spans[3].text()
 
             val readHref = spans[3].select("a").attr("href")
 
@@ -136,8 +137,10 @@ class UserFragment : BaseFragment() {
         }
 
         root.rvRecord.adapter!!.notifyDataSetChanged()
-
         root.tvRead.text = records.size.toString()
+
+        val mainActivity = activity as MainActivity
+        mainActivity.likeFragment.initData()
     }
 
     private fun showLogin(){

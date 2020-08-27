@@ -26,6 +26,11 @@ class MainActivity : BaseActivity() {
             fabMain.setImageResource(R.mipmap.icon_home_solid)
             fabMain.imageTintList = ColorStateList.valueOf(resources.getColor(R.color.blue))
         }
+        fabMain.setOnLongClickListener {
+            mainFragment.requestMain()
+            true
+        }
+
         ivLike.setOnClickListener {
             showFragment(likeFragment)
             ivLike.setImageResource(R.mipmap.icon_like_solid)

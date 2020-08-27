@@ -77,7 +77,6 @@ class LoginFragment : BottomSheetDialogFragment() {
                     if(activity is MainActivity){
                         val mainActivity = activity as MainActivity
                         mainActivity.userFragment.initData()
-                        mainActivity.likeFragment.initData()
                     }
                     dismiss()
                 } else {

@@ -13,6 +13,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.manhua.oh.R
 import com.manhua.oh.activity.ComicActivity
 import kotlinx.android.synthetic.main.activity_comic.*
+import kotlinx.android.synthetic.main.fragment_menu.*
 
 
 class MenuFragment : BottomSheetDialogFragment() {
@@ -49,7 +50,10 @@ class MenuFragment : BottomSheetDialogFragment() {
                 ivDirect.rotation = 0f
                 if (direct == RecyclerView.HORIZONTAL)
                     ivDirect.rotation = 90f
+                comicActivity.updateCurrent(comicActivity.current)
             }
+            if(comicActivity.rvComic.visibility == View.VISIBLE)
+                comicActivity.ivDirect.rotation = 0f
 
             val sbPage = view.findViewById<SeekBar>(R.id.sbPage)
             sbPage.max = comicActivity.vpComic.adapter!!.itemCount - 1
@@ -57,6 +61,7 @@ class MenuFragment : BottomSheetDialogFragment() {
             val onSeekBarChangeListener = object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     comicActivity.updateCurrent(progress)
+                    comicActivity.updateVisible()
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {

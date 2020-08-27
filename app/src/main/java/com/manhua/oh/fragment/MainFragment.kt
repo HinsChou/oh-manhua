@@ -59,22 +59,19 @@ class MainFragment : BaseFragment() {
 
         root.lvGroup.adapter = groupSimpleAdapter
 
-        root.srlMain.setOnRefreshListener {
-            requestMain()
-        }
-    }
+}
 
     private fun initData() {
-        root.srlMain.isRefreshing = true
+        root.pbRequest.visibility = View.VISIBLE
         requestMain()
     }
 
-    private fun requestMain() {
+     fun requestMain() {
         val url = Constant.URL + "?t=" + System.currentTimeMillis()
         ComicLoader.refer = url
 
         val stringRequest = CookieRequest(url, Response.Listener {
-            activity?.runOnUiThread(Runnable { root.srlMain.isRefreshing = false })
+            root.pbRequest.visibility = View.GONE
             handleHtml(it)
         }, Response.ErrorListener {
             it.printStackTrace()

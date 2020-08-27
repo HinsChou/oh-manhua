@@ -7,10 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.SimpleAdapter
 import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
 import com.manhua.oh.Constant
 import com.manhua.oh.database.OhDatabase
 import com.manhua.oh.R
+import com.manhua.oh.adapter.ChapterSimpleAdapter
 import com.manhua.oh.adapter.SearchSimpleAdapter
 import com.manhua.oh.request.CookieRequest
 import com.manhua.oh.tool.VolleyQueue
@@ -31,7 +34,48 @@ class SearchFragment : BaseFragment() {
         root = inflater.inflate(R.layout.fragment_search, container, false)
 
         initView()
+        initData()
         return root;
+    }
+
+    private val arrayListType = ArrayList<HashMap<String, String>>()
+    private fun initData() {
+        val chapterSimpleAdapter = ChapterSimpleAdapter(activity as Context, arrayListType, R.layout.item_gridview_chapter,
+        arrayOf("tvName"), intArrayOf(R.id.tvName))
+        root.gvType.adapter = chapterSimpleAdapter
+        requestOrder()
+    }
+
+    private fun requestOrder(){
+        val url = Constant.URL + "/show"
+        val stringRequest = StringRequest(url, Response.Listener {
+            handleHtml(it)
+        }, Response.ErrorListener {
+            it.printStackTrace()
+        })
+        VolleyQueue.addRequest(stringRequest)
+    }
+
+    private fun handleHtml(html : String){
+        val document = Jsoup.parse(html)
+
+        arrayListType.clear()
+        val types = document.select("div.fed-casc-list > dl")[1].select("dd > a")
+        for (type in types) {
+            val href = type.attr("href")
+            if(href.startsWith("/show?")){
+                val text = type.text()
+
+                val hashMap = HashMap<String, String>()
+                hashMap["tvName"] = text
+                hashMap["href"] = href
+                hashMap["read"] = false.toString()
+
+                arrayListType.add(hashMap)
+            }
+        }
+
+        (root.gvType.adapter as SimpleAdapter).notifyDataSetChanged()
     }
 
     private val arrayList = ArrayList<HashMap<String, String>>()
