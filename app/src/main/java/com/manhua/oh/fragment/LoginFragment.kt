@@ -12,6 +12,7 @@ import androidx.fragment.app.DialogFragment
 import com.android.volley.Request
 import com.android.volley.Response
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.manhua.oh.Constant
 import com.manhua.oh.database.OhDatabase
 import com.manhua.oh.R
 import com.manhua.oh.activity.MainActivity
@@ -46,7 +47,7 @@ class LoginFragment : BottomSheetDialogFragment() {
 
     private var verifyId = ""
     private fun updateVerify() {
-        val url = "https://www.ohmanhua.com/dynamic/kaptcha?t=" + System.currentTimeMillis()
+        val url = Constant.URL + "/dynamic/kaptcha?t=" + System.currentTimeMillis()
         val imageRequest = VerifyRequest(url, Response.Listener {
             root.ivVerify.setImageBitmap(it)
         }, 0, 0, ImageView.ScaleType.FIT_XY, Bitmap.Config.ARGB_8888, Response.ErrorListener() {
@@ -59,7 +60,7 @@ class LoginFragment : BottomSheetDialogFragment() {
     }
 
     private fun login() {
-        val url = "https://www.ohmanhua.com/user/loginHandle?t=" + System.currentTimeMillis()
+        val url = Constant.URL + "/user/loginHandle?t=" + System.currentTimeMillis()
 
         val params = HashMap<String, String>()
         params["user_name"] = root.etUsername.text.toString()

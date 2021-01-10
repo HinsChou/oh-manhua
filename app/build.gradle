@@ -48,4 +48,6 @@ dependencies {
     androidTestImplementation 'androidx.room:room-testing:2.2.5'
     implementation 'com.google.code.gson:gson:2.8.6'
     debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
+
+//    implementation("com.squareup.okhttp3:okhttp:4.9.0")
 }

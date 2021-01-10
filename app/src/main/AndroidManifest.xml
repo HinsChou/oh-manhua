@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activity.SearchActivity"></activity>
+        <activity android:name=".activity.SearchActivity" />
         <activity android:name=".activity.CoverActivity" />
         <activity android:name=".activity.ComicActivity" />
         <activity android:name=".activity.BaseActivity" />

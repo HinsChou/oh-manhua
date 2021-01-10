@@ -16,7 +16,9 @@
         app:layout_constraintBottom_toTopOf="@id/tvTitle"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp">
 
         <ImageView
             android:id="@+id/ivCover"
@@ -24,7 +26,7 @@
             android:layout_height="@dimen/cover_height_small"
             android:background="@color/colorLoading"
             android:src="@drawable/loading_0"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"/>
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -40,7 +42,6 @@
         app:layout_constraintStart_toStartOf="@id/mcvComic"
         app:layout_constraintEnd_toEndOf="@id/mcvComic" />
 
-
     <TextView
         android:id="@+id/tvChapter"
         android:layout_width="0dp"
@@ -51,5 +52,17 @@
         android:textSize="@dimen/text_size_sub"
         android:maxLines="1"
         android:textColor="@color/colorTextHint" />
+
+    <TextView
+        android:id="@+id/tvRecord"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/tvTitle"
+        app:layout_constraintEnd_toEndOf="@id/tvTitle"
+        app:layout_constraintBottom_toBottomOf="@id/mcvComic"
+        android:textSize="@dimen/text_size_sub"
+        android:maxLines="1"
+        android:layout_marginBottom="8dp"
+        android:textColor="@color/blue" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

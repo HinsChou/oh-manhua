@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.AnimationDrawable
 import android.os.Environment
+import android.util.Log
 import android.widget.ImageView
 import androidx.core.app.ActivityCompat
 import com.android.volley.Response
@@ -66,6 +67,7 @@ object ComicLoader {
                     ImageView.ScaleType.CENTER_CROP,
                     Bitmap.Config.ARGB_8888,
                     Response.ErrorListener {
+                        Log.e(TAG, it.toString())
                         val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.loading_0)
                         hashMap[path] = bitmap
                         if(imageView != null)

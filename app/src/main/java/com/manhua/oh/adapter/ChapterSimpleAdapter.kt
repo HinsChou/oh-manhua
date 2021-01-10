@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckedTextView
 import android.widget.SimpleAdapter
 import android.widget.TextView
 import com.manhua.oh.R
@@ -24,7 +25,7 @@ class ChapterSimpleAdapter(
             context.startActivity(Intent(context, ComicActivity::class.java).putExtra("href", hm["href"]))
         }
 
-        val tvName = view.findViewById<TextView>(R.id.tvName)
+        val tvName = view.findViewById<CheckedTextView>(R.id.tvName)
         if (hm["read"] != null && hm["read"] == true.toString()) {
             tvName.setBackgroundResource(R.drawable.shape_tag)
             tvName.setTextColor(context.resources.getColor(R.color.white))

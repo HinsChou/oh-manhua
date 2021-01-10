@@ -2,6 +2,7 @@ package com.manhua.oh.fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,9 @@ import com.manhua.oh.tool.VolleyQueue
 import kotlinx.android.synthetic.main.fragment_like.view.*
 import kotlinx.android.synthetic.main.fragment_user.*
 import org.jsoup.Jsoup
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * A simple [Fragment] subclass.
@@ -49,7 +53,7 @@ class LikeFragment : BaseFragment() {
 
      fun initData() {
         user = OhDatabase.db.getLogin()
-        val url = "https://www.ohmanhua.com/dynamic/user/subscription?t=" + System.currentTimeMillis()
+        val url = Constant.URL + "/dynamic/user/subscription?t=" + System.currentTimeMillis()
         val stringRequest = CookieRequest(url, Response.Listener {
             handleHtml(it)
             root.srlLike.isRefreshing = false
@@ -70,6 +74,7 @@ class LikeFragment : BaseFragment() {
 
         val ul = documented.select("form.fed-user-info > ul.fed-user-list")
         val likes = ul.select("li.fed-line-top > div.fed-user-input")
+        Log.i(TAG, "likes ${likes.size}")
 
         arrayList.clear()
         for (like in likes) {

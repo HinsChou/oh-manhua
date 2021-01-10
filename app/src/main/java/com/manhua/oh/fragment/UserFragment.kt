@@ -18,6 +18,7 @@ import com.manhua.oh.bean.Comic
 import com.manhua.oh.request.CookieRequest
 import com.manhua.oh.tool.ComicLoader
 import com.manhua.oh.tool.VolleyQueue
+import kotlinx.android.synthetic.main.fragment_user.*
 import kotlinx.android.synthetic.main.fragment_user.view.*
 import org.jsoup.Jsoup
 import java.text.SimpleDateFormat
@@ -49,6 +50,8 @@ class UserFragment : BaseFragment() {
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         val comicAdapter = ComicAdapter(activity as Context, records)
         root.rvRecord.adapter = comicAdapter
+
+        root.ivHead.setOnClickListener { showLogin() }
     }
 
     fun initData() {
@@ -63,11 +66,6 @@ class UserFragment : BaseFragment() {
             root.tvUserId.visibility = View.INVISIBLE
             root.tvUserName.text = user.username
 
-            root.fabLogin.backgroundTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.colorAccent))
-            root.fabLogin.setOnClickListener { showLogin() }
-            root.fabLogin.setImageResource(R.mipmap.icon_enter)
-
         } else {
             root.clRecord.visibility = View.VISIBLE
 
@@ -77,13 +75,8 @@ class UserFragment : BaseFragment() {
             root.tvUserId.text = user.userId
             root.tvUserName.text = user.username
 
-            root.fabLogin.backgroundTintList =
-                ColorStateList.valueOf(resources.getColor(R.color.red))
-            root.fabLogin.setOnClickListener { logOut() }
-            root.fabLogin.setImageResource(R.mipmap.icon_error)
-
             // 请求历史记录
-            val url = "https://www.ohmanhua.com/dynamic/user/history"
+            val url = Constant.URL + "/dynamic/user/history"
             val cookieRequest = CookieRequest(url, Response.Listener {
                 handleHtml(it)
             }, Response.ErrorListener {
@@ -144,8 +137,14 @@ class UserFragment : BaseFragment() {
     }
 
     private fun showLogin(){
-        val loginFragment = LoginFragment()
-        loginFragment.show(activity!!.supportFragmentManager, "")
+        val user = OhDatabase.db.getLogin()
+        // 未登录弹窗
+        if(user.cookie.isEmpty()){
+            val loginFragment = LoginFragment()
+            loginFragment.show(activity!!.supportFragmentManager, "")
+        }else{
+            logOut()
+        }
     }
 
     private fun logOut() {

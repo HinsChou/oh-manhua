@@ -16,6 +16,7 @@ import com.manhua.oh.R
 import com.manhua.oh.adapter.ChapterSimpleAdapter
 import com.manhua.oh.bean.Comic
 import com.manhua.oh.bean.Record
+import com.manhua.oh.request.CookieRequest
 import com.manhua.oh.request.FormRequest
 import com.manhua.oh.tool.ComicLoader
 import com.manhua.oh.tool.Snack
@@ -24,6 +25,7 @@ import kotlinx.android.synthetic.main.activity_cover.*
 import kotlinx.android.synthetic.main.fragment_like.*
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
+import java.io.IOException
 
 class CoverActivity : BaseActivity() {
 
@@ -62,7 +64,7 @@ class CoverActivity : BaseActivity() {
                 likeComic()
         }
 
-        onTabSelected.setTabs(arrayOf(tvBrief, gvTag))
+        onTabSelected.setTabs(arrayOf(gvTag, tvBrief))
         tlOther.addOnTabSelectedListener(onTabSelected)
     }
 
@@ -86,7 +88,7 @@ class CoverActivity : BaseActivity() {
     }
 
     private fun likeComic() {
-        val url = "https://www.ohmanhua.com/dynamic/user/addToFav"
+        val url = Constant.URL + "/dynamic/user/addToFav"
         val params = HashMap<String, String>()
         params["dataId"] = comic.dataId
 
@@ -111,7 +113,7 @@ class CoverActivity : BaseActivity() {
     }
 
     private fun hateComic() {
-        val url = "https://www.ohmanhua.com/dynamic/user/subscriptionHandle"
+        val url = Constant.URL + "/dynamic/user/subscriptionHandle"
         val params = HashMap<String, String>()
         params["dataIds"] = comic.dataLongId
         params["type"] = "1"

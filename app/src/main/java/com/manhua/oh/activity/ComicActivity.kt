@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Base64.DEFAULT
 import android.util.Log
 import android.view.View
@@ -87,8 +88,7 @@ class ComicActivity : BaseActivity() {
             if (vpComic.currentItem == 0) {
                 loadPrev()
             } else {
-                val position = vpComic.currentItem - 1
-                updateCurrent(position)
+                vpComic.currentItem --
                 updateVisible()
             }
         }
@@ -96,8 +96,7 @@ class ComicActivity : BaseActivity() {
             if (chapter.page != 0 && vpComic.currentItem == chapter.page - 1) {
                 loadNext()
             } else {
-                val position = vpComic.currentItem + 1
-                updateCurrent(position)
+                vpComic.currentItem ++
                 updateVisible()
             }
         }
@@ -118,7 +117,7 @@ class ComicActivity : BaseActivity() {
 
     private fun reload() {
         chapter.page = 0
-        countLoad = 1
+        loadedPage = -1
         bitmaps.clear()
         updateAdapter()
         updatePage()
@@ -137,6 +136,7 @@ class ComicActivity : BaseActivity() {
         ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
+            Log.i(comicActivity.TAG, "onPageSelected $position")
             comicActivity.updateCurrent(position)
             if(comicActivity.rvComic.visibility != View.VISIBLE)
                 comicActivity.rvComic.scrollToPosition(position)
@@ -152,7 +152,7 @@ class ComicActivity : BaseActivity() {
             super.onScrollStateChanged(recyclerView, newState)
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                 val position = (comicActivity.rvComic.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
-                Log.i("zxs", "onScrollStateChanged $position")
+                Log.i(comicActivity.TAG, "onScrollStateChanged $position")
                 comicActivity.updateCurrent(position)
                 if(comicActivity.vpComic.visibility != View.VISIBLE)
                     comicActivity.vpComic.setCurrentItem(position, false)
@@ -162,10 +162,12 @@ class ComicActivity : BaseActivity() {
 
     var current = 0
     fun updateCurrent(position: Int) {
+        Log.i(TAG, "updateCurrent $position")
         current = position
         updatePage()
-        pbRequest.visibility = View.VISIBLE
-        addComic()
+        if(current == loadedPage)
+            pbRequest.visibility = View.VISIBLE
+        addComic(loadedPage + 1)
     }
 
     fun updateVisible(){
@@ -233,10 +235,20 @@ class ComicActivity : BaseActivity() {
                 dataPageId = text.replace("__jsData =", "")
             }
         }
-        var mh = decrypt(dataPage)
-        mh = mh.substring(mh.indexOf("{"), mh.indexOf("}") + 1)
-        val jsonObject = JSONObject(mh)
-        val total = jsonObject["totalimg"].toString().toInt()
+
+        var key = "fw122587mkertyui"
+        var mh = decrypt(key, dataPage)
+        if(mh.contains("{"))
+            mh = mh.substring(mh.indexOf("{"), mh.indexOf("}") + 1)
+        val joMh = JSONObject(mh)
+        var total = 0
+        Log.i(TAG, "joMh $joMh")
+        if(joMh.has("totalimg"))
+            total = joMh["totalimg"].toString().toInt()
+        else if(joMh.has("enc_code1")){
+            total = decrypt(key, joMh.getString("enc_code1")).toInt()
+        }
+
         chapter.page = total
         Log.i(TAG, "total = $total")
         val bitmap = BitmapFactory.decodeResource(resources, R.drawable.loading_0)
@@ -272,19 +284,23 @@ class ComicActivity : BaseActivity() {
         if (!next.startsWith("javascript:"))
             chapter.next = Constant.URL + next
 
-        val prefix = Constant.URL + "/comic" + dataId + URLEncoder.encode(title).replace("+", "%20") + "/"
+        var prefix = Constant.URL + "/comic" + dataId
+        if(joMh.has("enc_code2")){
+            var enc_code2 = decrypt("fw125gjdi9ertyui", joMh.getString("enc_code2"))
+            prefix += enc_code2.split("/")[1] + "/"
+        }else{
+            prefix += URLEncoder.encode(title).replace("+", "%20") + "/"
+        }
+
         chapter.prefix = prefix
         Log.i(TAG, "prefix = $prefix")
-
-        // 初始化列表
-        addComic()
     }
 
     private fun uploadRecord(pageId: String) {
         if (user.cookie.isEmpty())
             return
 
-        val url = "https://www.ohmanhua.com/counting"
+        val url = Constant.URL + "/counting"
         val headers = HashMap<String, String>()
         headers.put("cookie", "login_cookie=" + user.cookie)
         val params = HashMap<String, String>()
@@ -309,56 +325,55 @@ class ComicActivity : BaseActivity() {
         }
         pbPage.max = bitmaps.size
         pbPage.progress = vpComic.currentItem + 1
-        pbPage.secondaryProgress = countLoad
+        pbPage.secondaryProgress = loadedPage
     }
 
-    private var countLoad = 1;
-    private val maxLoad = 20
-    private var countRequest = 0;
-    private fun addComic() {
+    private var loadedPage = -1 // 已加载页
+    private val maxLoad = 5 // 最大加载数
+    private var countRequest = 0 // 请求数
+    private val handler = Handler(Looper.getMainLooper())
+    private fun addComic(loadPage : Int) {
         Log.i(
             TAG,
-            "addComic: countLoad = $countLoad, size = ${bitmaps.size} countRequest = $countRequest"
+            "addComic: currentPage ${vpComic.currentItem},loadPage $loadPage,maxPage ${chapter.page},countRequest $countRequest"
         )
 
-        // 单线程
-        if (countRequest >= 1 || countLoad > chapter.page) {
+        // 同时请求1个, 加载页不超过结尾页, 与当前页相差不超过最大缓存
+        if (countRequest >= 1 || loadPage >= chapter.page || loadPage - vpComic.currentItem >= maxLoad) {
+            Log.i(TAG, "addComic return")
             pbRequest.visibility = View.GONE
             return
         }
         countRequest++
 
-        var page = "0000$countLoad"
-        page = page.substring(page.length - 4, page.length)
+        var page = String.format("%04d", loadPage + 1)
         val src = "${chapter.prefix}$page.jpg"
-        val position = countLoad - 1
+        val position = loadPage
         ComicLoader.loadSrc(getActivity(), src, Response.Listener {
-            Log.i(TAG, "loadSrc finish = $src $countLoad")
+            Log.i(TAG, "loadSrc finish = $src")
             countRequest--
             runOnUiThread {
                 pbRequest.visibility = View.GONE
                 updatePage()
             }
 
-            Log.i(TAG, "bitmap.size = ${bitmaps.size} countLoad = $countLoad")
-            if (it != null)
+            if (it != null){
                 if (position < bitmaps.size)
                     bitmaps[position] = it
-                Handler().postDelayed({
+                handler.postDelayed({
                     updateAdapter()
                 }, 100)
+                loadedPage = loadPage
 
-                Log.i(TAG, "load bitmap = $countLoad - ${vpComic.currentItem}")
-                if (countLoad - vpComic.currentItem < maxLoad) {
-                    countLoad++
-                    addComic()
-                }
+                handler.postDelayed({
+                    addComic(loadedPage + 1)
+                }, 1000)
+            }
         })
     }
 
-    private fun decrypt(sSrc: String): String {
+    private fun decrypt(sKey: String, sSrc: String): String {
         return try {
-            val sKey = "fw12558899ertyui"
             val raw = sKey.toByteArray(charset("utf-8"))
             val skeySpec =
                 SecretKeySpec(raw, "AES")

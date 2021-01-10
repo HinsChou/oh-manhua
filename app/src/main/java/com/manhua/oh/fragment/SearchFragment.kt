@@ -17,9 +17,11 @@ import com.manhua.oh.adapter.ChapterSimpleAdapter
 import com.manhua.oh.adapter.SearchSimpleAdapter
 import com.manhua.oh.request.CookieRequest
 import com.manhua.oh.tool.VolleyQueue
+import kotlinx.android.synthetic.main.fragment_search.*
 import kotlinx.android.synthetic.main.fragment_search.view.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import java.lang.StringBuilder
 import java.net.URLEncoder
 
 /**
@@ -48,9 +50,9 @@ class SearchFragment : BaseFragment() {
 
     private fun requestOrder(){
         val url = Constant.URL + "/show"
-        val stringRequest = StringRequest(url, Response.Listener {
+        val stringRequest = StringRequest(url, {
             handleHtml(it)
-        }, Response.ErrorListener {
+        }, {
             it.printStackTrace()
         })
         VolleyQueue.addRequest(stringRequest)
@@ -102,14 +104,13 @@ class SearchFragment : BaseFragment() {
         root.pbSearch.visibility = View.VISIBLE
         val key = root.etSearch.text.toString()
 
-        val url = "https://www.ohmanhua.com/search?searchString=" + URLEncoder.encode(key).replace(" ", "%20")
+        val url = Constant.URL + "/search?searchString=" + URLEncoder.encode(key).replace(" ", "%20")
         Log.i(TAG, "request url = $url")
         val cookieRequest = CookieRequest(url, Response.Listener {
-//            Log.i(TAG, "request it = $it")
             handleSearch(it)
             root.pbSearch.visibility = View.GONE
         }, Response.ErrorListener {
-            Log.i(TAG, "request it = ${it.networkResponse.data}")
+            Log.e(TAG, "request it = ${it.networkResponse.data}")
             root.pbSearch.visibility = View.GONE
         }, OhDatabase.db.getLogin().cookie)
 
@@ -124,13 +125,15 @@ class SearchFragment : BaseFragment() {
         for (dl in dls) {
             arrayList.add(fillComic(dl))
         }
+        gvType.visibility = if(dls.isEmpty()) View.VISIBLE else View.GONE
+
         searchSimpleAdapter.notifyDataSetChanged()
     }
 
     private fun fillComic(dl: Element): HashMap<String, String> {
         val hashMap = HashMap<String, String>()
 
-        val title = dl.select("dd.fed-deta-content > h1.fed-part-eone").text()
+        val title = dl.select("dd.fed-deta-content > h1.fed-part-eone > a").text()
         hashMap["tvTitle"] = title
 
         val src = dl.select(" > dt.fed-deta-images > a.fed-list-pics").attr("data-original")
@@ -160,6 +163,5 @@ class SearchFragment : BaseFragment() {
         }
 
         return hashMap
-
     }
 }
